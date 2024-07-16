@@ -3,12 +3,23 @@
 function echo_blue_bold {
     echo -e "\033[1;34m$1\033[0m"
 }
+
+PRIVATE_KEY_FILE="private_key.txt"
+
+if [ -f "$PRIVATE_KEY_FILE" ]; then
+    echo_blue_bold "Using stored private key from $PRIVATE_KEY_FILE"
+    privateKeys=$(cat $PRIVATE_KEY_FILE)
+else
+    echo
+    echo_blue_bold "Enter private key:"
+    read -s privateKeys
+    echo "$privateKeys" > $PRIVATE_KEY_FILE
+    echo_blue_bold "Private key stored in $PRIVATE_KEY_FILE"
+fi
+
 echo
 echo_blue_bold "Using RPC URL: https://testnet-rpc.superposition.so/"
 providerURL="https://testnet-rpc.superposition.so/"
-echo
-echo_blue_bold "Enter private key:"
-read -s privateKeys
 echo
 echo_blue_bold "Contract address: 0xE934c31A0aEfB7D5840203b86FD11b26AE1A27b4"
 contractAddress="0xE934c31A0aEfB7D5840203b86FD11b26AE1A27b4"
@@ -43,6 +54,7 @@ echo
 temp_node_file=$(mktemp /tmp/node_script.XXXXXX.js)
 
 cat << EOF > $temp_node_file
+const fs = require("fs");
 const ethers = require("ethers");
 
 const providerURL = "${providerURL}";
